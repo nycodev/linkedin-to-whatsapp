@@ -8,10 +8,12 @@ const {
 } = require("linkedin-jobs-scraper");
 const express = require('express');
 
+const wbm = require('wbm');
 const server = express();
 
+
 server.get('/', (request, response)=> {
-    response.send('')
+    response.send(jobs)
 });
 
 const port = 3000;
@@ -19,13 +21,14 @@ server.listen(port, () => {
     `running`
 });
 
+let jobs = [] ;
 
 (async () => {
     // Each scraper instance is associated with one browser.
     // Concurrent queries will run on different pages within the same browser instance.
     const scraper = new LinkedinScraper({
         headless: true,
-        slowMo: 500,
+        slowMo: 1000,
         args: [
             "--lang=en-GB",
         ],
@@ -33,22 +36,19 @@ server.listen(port, () => {
 
     // Add listeners for scraper events
     scraper.on(events.scraper.data, (data) => {
-        console.log(
+        jobs.push(
             data.description.length,
             data.descriptionHTML.length,
-            `Query='${data.query}'`,
-            `Location='${data.location}'`,
-            `Id='${data.jobId}'`,
-            `Title='${data.title}'`,
-            `Company='${data.company ? data.company : "N/A"}'`,
-            `Place='${data.place}'`,
-            `Date='${data.date}'`,
+            `Titulo='${data.title}'`,
+            `Empresa='${data.company ? data.company : "N/A"}'`,
+            `Local='${data.place}'`,
+            `Data='${data.date}'`,
             `Link='${data.link}'`,
-            `applyLink='${data.applyLink ? data.applyLink : "N/A"}'`,
-            `senorityLevel='${data.senorityLevel}'`,
-            `function='${data.jobFunction}'`,
-            `employmentType='${data.employmentType}'`,
-            `industries='${data.industries}'`,
+            `Aplicar='${data.applyLink ? data.applyLink : "N/A"}'`,
+            `Nivel de senioridade='${data.senorityLevel}'`,
+            `função='${data.jobFunction}'`,
+            `Tipo de emprego='${data.employmentType}'`,
+            `industria='${data.industries}'`,
         );
     });
 
@@ -93,10 +93,25 @@ server.listen(port, () => {
         ], { // Global options for this run, will be merged individually with each query options (if any)
             locations: ["Brazil"],
             optimize: true,
-            limit: 30,
+            limit: 5,
         }),
     ]);
 
     // Close browser
     await scraper.close();
 })();
+
+
+setTimeout(() => {
+    let msg = jobs.toString()
+    wbm.start().then(async () => {
+        const contacts = [
+            { phone: '556784424975', name: msg }
+        ];
+        const message = '{{name}}';
+        // Hi Bruno, your age is 21
+        // Hi Will, your age is 33
+        await wbm.send(contacts, message);
+        await wbm.end();
+    }).catch(err => console.log(err));    
+}, 90000);
