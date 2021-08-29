@@ -6,20 +6,9 @@ const {
     experienceLevelFilter,
     events,
 } = require("linkedin-jobs-scraper");
-const express = require('express');
+
 
 const wbm = require('wbm');
-const server = express();
-
-
-server.get('/', (request, response)=> {
-    response.send(jobs)
-});
-
-const port = 3000;
-server.listen(port, () => {
-    `running`
-});
 
 let jobs = [] ;
 
@@ -106,11 +95,9 @@ setTimeout(() => {
     let msg = jobs.toString()
     wbm.start().then(async () => {
         const contacts = [
-            { phone: '556784424975', name: msg }
+            { phone: '556784327928', name: msg }
         ];
         const message = '{{name}}';
-        // Hi Bruno, your age is 21
-        // Hi Will, your age is 33
         await wbm.send(contacts, message);
         await wbm.end();
     }).catch(err => console.log(err));    
