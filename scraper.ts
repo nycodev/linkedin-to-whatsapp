@@ -1,3 +1,7 @@
+import { sendMsg } from "./sendMessage";
+
+
+
 const { 
     LinkedinScraper,
     relevanceFilter,
@@ -8,7 +12,6 @@ const {
 } = require("linkedin-jobs-scraper");
 
 
-const wbm = require('wbm');
 
 let jobs = [] ;
 
@@ -26,18 +29,15 @@ let jobs = [] ;
     // Add listeners for scraper events
     scraper.on(events.scraper.data, (data) => {
         jobs.push(
-            data.description.length,
-            data.descriptionHTML.length,
-            `Titulo='${data.title}'`,
-            `Empresa='${data.company ? data.company : "N/A"}'`,
-            `Local='${data.place}'`,
-            `Data='${data.date}'`,
-            `Link='${data.link}'`,
-            `Aplicar='${data.applyLink ? data.applyLink : "N/A"}'`,
-            `Nivel de senioridade='${data.senorityLevel}'`,
-            `função='${data.jobFunction}'`,
-            `Tipo de emprego='${data.employmentType}'`,
-            `industria='${data.industries}'`,
+            `\n\n*${data.title}* `,
+            `\n*Empresa:*  '${data.company ? data.company : "N/A"}'`,
+            `\n*Local:*  '${data.place}'`,
+            `\n*Data:*  '${data.date}'`,
+            `\n*Link:*  '${data.link}'`,
+            `\n*Nivel de senioridade:*  '${data.senorityLevel}'`,
+            `\n*Função:*  '${data.jobFunction}'`,
+            `\n*Tipo de emprego:*  '${data.employmentType}'`,
+            `\n*Industria:*  \n '${data.industries}'\n\n -----------------------------------------------\n `,
         );
     });
 
@@ -72,7 +72,6 @@ let jobs = [] ;
             {
                 query: "Programador node js junior",
                 options: {
-                    locations: [""], // This will be merged with the global options => ["United States", "Europe"]
                     filters: {
                         type: [typeFilter.FULL_TIME, typeFilter.CONTRACT],
                         time: timeFilter.DAY                           
@@ -90,15 +89,4 @@ let jobs = [] ;
     await scraper.close();
 })();
 
-
-setTimeout(() => {
-    let msg = jobs.toString()
-    wbm.start().then(async () => {
-        const contacts = [
-            { phone: '556784327928', name: msg }
-        ];
-        const message = '{{name}}';
-        await wbm.send(contacts, message);
-        await wbm.end();
-    }).catch(err => console.log(err));    
-}, 90000);
+sendMsg(jobs)
