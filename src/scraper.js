@@ -1,5 +1,4 @@
-import { sendMsg } from "./sendMessage";
-
+const sendMessage = require('./sendMsg')
 
 
 const { 
@@ -10,6 +9,7 @@ const {
     experienceLevelFilter,
     events,
 } = require("linkedin-jobs-scraper");
+
 
 
 
@@ -87,6 +87,8 @@ let jobs = [] ;
 
     // Close browser
     await scraper.close();
+    sendMessage.sendMsg(jobs)
 })();
 
-sendMsg(jobs)
+
+
